@@ -15,7 +15,7 @@ public class Creature {
 	public Image wasp = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/wasp.fw.png");
 	public Image vann = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/creature.fw.png");
 	public Image rabbit = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/rabbit.fw.png");
-	
+	public Image rat = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/rat.fw.png");
 	private Random rand = new Random();
 	private int mem = rand.nextInt( 150);
 	private int dx = 0;
@@ -31,6 +31,12 @@ public class Creature {
 		
 		if ( type.equals("vann")) {
 			x= x - 1;
+			y= y - 1;		
+		}
+	
+		
+		if ( type.equals("rat")) {
+			x= x + 1;
 			y= y - 1;		
 		}
 		
@@ -65,7 +71,7 @@ public class Creature {
 		
 		if (type.equals("wasp")) return wasp;
 		if (type.equals("rabbit")) return rabbit;
-		
+	    if (type.equals("rat")) return rat;
 		return vann;
 			
 	}

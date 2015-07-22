@@ -114,6 +114,11 @@ public class Main extends Application {
     	c.type = "rabbit";
     	creatures.add( c);
     	
+    	c= new Creature();
+    	c.x = 400;
+    	c.x = 500;
+    	c.type = "rat";
+    	creatures.add( c);
 		
 		launch(args);
 	}
