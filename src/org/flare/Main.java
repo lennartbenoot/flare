@@ -26,6 +26,8 @@ public class Main extends Application {
 	
 	public static ArrayList<Creature> creatures = new ArrayList<Creature>();
 	public Image desert = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/desert.fw.png");
+	public Image desertGrass = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/desert-grass.fw.png");
+	private Random rand = new Random();
 	
 	@Override
 	public void start(Stage theStage) {
@@ -50,10 +52,21 @@ public class Main extends Application {
 	                    public void handle(ActionEvent event) {
 	                    	
 	                    	gc.clearRect(0, 0, MAX_X, MAX_Y);
+	                    	
 	                    	// draw background
 	                    	for ( int x = 0; x < MAX_X / 16; x++)
-	                    		for ( int y = 0; y < MAX_Y / 16; y++)
-	                    			gc.drawImage( desert, x * 16, y * 16);
+	                    		for ( int y = 0; y < MAX_Y / 16; y++) {
+	                    			
+	                    			int tile = ( 3 * x + 7 * y - x) % 10;
+	                    			
+	                    			if ( tile == 8) 
+	                    				gc.drawImage( desertGrass, x * 16, y * 16);
+	                    			else if ( tile == 5) 
+	                    				gc.drawImage( desertGrass, x * 16, y * 16);
+	                    			else
+	                    				gc.drawImage( desert, x * 16, y * 16);
+	                    		}
+	                    			
 	                    	
 	                    	
 	                    	for ( Creature c : creatures) {
