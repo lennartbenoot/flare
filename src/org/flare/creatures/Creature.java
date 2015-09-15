@@ -8,18 +8,23 @@ import javafx.scene.image.Image;
 
 public class Creature {
 	
-	public int x; 
-	public int y;
+	public float x; 
+	public float y;
+	
+	//
+	public int stamina;
+	public float avgSpeed;  // average speed in meters per second x 10
+	
 	public String name;
 	public String type;
-	public Image wasp = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/wasp.fw.png");
-	public Image vann = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/creature.fw.png");
+	public Image wasp = new Image ( "https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/wasp.fw.png") ;
+	public Image creature = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/creature.fw.png");
 	public Image rabbit = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/rabbit.fw.png");
-	public Image rat = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/rat.fw.png");
+	public Image you = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/Orange.fw.png");
 	private Random rand = new Random();
 	private int mem = rand.nextInt( 150);
-	private int dx = 0;
-	private int dy = 0;
+	public int dx = 0;
+	public int dy = 0;
 	
 	public void move() {
 		
@@ -27,20 +32,11 @@ public class Creature {
 			x= x + zeroOneOrMinusOne();
 			y= y + zeroOneOrMinusOne();		
 		}
-		
-		
-		if ( type.equals("vann")) {
+		else if ( type.equals("vann")) {
 			x= x - 1;
 			y= y - 1;		
 		}
-	
-		
-		if ( type.equals("rat")) {
-			x= x + 1;
-			y= y - 1;		
-		}
-		
-		if ( type.equals("rabbit")) {
+		else if ( type.equals("rabbit")) {
 			mem ++;
 			
 			if (mem == 100) {
@@ -57,12 +53,15 @@ public class Creature {
 			x= x + dx;
 			y= y + dy;		
 		}
+		else if ( type.equals("you")) {
+			x= x + dx;
+			y= y + dy;	
+		}
+		else {
+			x= x + dx;
+			y= y + dy;	
+		}
 		
-		//keep creature within world
-		if (x > Main.MAX_X) x=0;
-		if (y > Main.MAX_Y) y=0;
-		if (x < 0) x= Main.MAX_X;
-		if (y < 0) y= Main.MAX_Y;
 		 
 	}
 	
@@ -71,15 +70,14 @@ public class Creature {
 		
 		if (type.equals("wasp")) return wasp;
 		if (type.equals("rabbit")) return rabbit;
-	    if (type.equals("rat")) return rat;
-		return vann;
+	    if (type.equals("you")) return creature;
+	    
+		return creature;
 			
 	}
 	
 	
 	private int zeroOneOrMinusOne() {
-		
-		
 		
 		return ( rand.nextInt( 3) - 1);
 	}
