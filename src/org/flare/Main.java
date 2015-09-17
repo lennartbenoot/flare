@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.flare.creatures.Creature;
 import org.flare.creatures.Rat;
 import org.flare.map.Map;
+import org.flare.map.MapClient;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -42,6 +43,9 @@ public class Main extends Application {
 	public static int canvasY1 = 0;
 	public static int canvasX2;
 	public static int canvasY2;
+	
+    public static DataOutputStream outToServer;
+    public static BufferedReader inFromServer;
 
 	public static ArrayList<Creature> creatures = new ArrayList<Creature>();
 	public Image desert = new Image(
@@ -110,7 +114,7 @@ public class Main extends Application {
 				}
 			});
 
-			KeyFrame animate = new KeyFrame(Duration.seconds(.05), new EventHandler<ActionEvent>() {
+			KeyFrame animate = new KeyFrame(Duration.seconds( 0.05), new EventHandler<ActionEvent>() {
 
 				public void handle(ActionEvent event) {
 
@@ -127,7 +131,7 @@ public class Main extends Application {
 					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
 						for (int y = 0; y < MAX_Y / TILE_SIZE; y++) {
 
-							long tile = Map.getTile( canvasX1 + x, canvasY1 +y);
+							long tile = MapClient.getTile( canvasX1 + x, canvasY1 +y);
 							Image tileImage;
 							
 
@@ -181,19 +185,12 @@ public class Main extends Application {
 		try {
 		    connection = new Socket(hostname, 9999);
 		  
-		    DataOutputStream outToServer = new DataOutputStream( connection.getOutputStream());
-		    BufferedReader inFromServer = new BufferedReader(new InputStreamReader( connection.getInputStream()));
-		    
+		    outToServer = new DataOutputStream( connection.getOutputStream());
+		    inFromServer = new BufferedReader(new InputStreamReader( connection.getInputStream()));
 		    
 		    outToServer.writeBytes( "CMD_PLAYER:"+playerName+":"+password + '\n');
-//			PrintWriter out =
-//		        new PrintWriter(echoSocket.getOutputStream(), true);
-//		    BufferedReader in =
-//		        new BufferedReader(
-//		            new InputStreamReader(echoSocket.getInputStream()));
-//		    BufferedReader stdIn =
-//		        new BufferedReader(
-//		            new InputStreamReader(System.in))
+		    inFromServer.readLine();
+
 		}
 		catch (Exception e){
 			e.printStackTrace();
