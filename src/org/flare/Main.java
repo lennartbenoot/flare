@@ -8,8 +8,9 @@ import java.util.ArrayList;
 
 import org.flare.creatures.Creature;
 import org.flare.creatures.Rat;
-import org.flare.map.Map;
 import org.flare.map.MapClient;
+import org.flare.server.player.Challenge;
+import org.flare.server.player.Player;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -24,6 +25,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -54,8 +57,9 @@ public class Main extends Application {
 			"https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/desert-grass.fw.png");
 	public Image desertStone = new Image(
 			"https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/desert-stone.fw.png");
+	public Image creatureImage = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/creature.fw.png");
 
-	public static Creature you = new Creature();
+	public static Player you = new Player();
 
 	@Override
 	public void start(Stage theStage) {
@@ -153,13 +157,21 @@ public class Main extends Application {
 						float posX = (c.x - canvasX1 )  * (float) TILE_SIZE;
 						float posY = MAX_Y - ( (c.y - canvasY1) * (float) TILE_SIZE);
 
-						gc.drawImage(c.getImage(), posX, posY);
+						
+						gc.drawImage( creatureImage, posX, posY);
 					}
 					
 					// debug info
 					gc.fillText("MAP: (" + canvasX1 + "," + canvasY1 + ")-(" + canvasX2 + "," + canvasY2  + ")", 10, 10);
 					gc.fillText("YOU: (" + you.x + "," + you.y + ")", 10, 20 );
-
+					
+					// Dashboard
+					gc.setFill(Color.WHITE);
+					gc.fillRect(5, MAX_Y - 65, MAX_X - 10, 60);
+					gc.setFill(Color.RED);
+					gc.fillText("Your next challenge" , 7, MAX_Y - 52);
+					gc.setFill(Color.BLACK);
+					gc.fillText(Challenge.challenge[ 0], 7, MAX_Y - 32);
 				}
 			});
 
@@ -196,9 +208,6 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 
-		//
-		System.out.println( "Welcome, " + playerName);
-		
 		you.x = 32;
 		you.y = 24;
 		you.type = "you";

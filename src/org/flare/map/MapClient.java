@@ -8,13 +8,12 @@ import org.flare.Main;
 public class MapClient {
 	
 	/** 
-	 * Data is chached in block of 100x100
+	 * Data is cached in blocks of 100x100
 	 * when location is requested on position 1055, 754
 	 * block (0,0) -> (0,0) - (99,99)
 	 * block (1,1) -> (100,100) - (199,199)
 	 * block (1,0) -> (100,0) - (199,99)-
 	 * **/ 
-	
 	private static HashMap<String,String> mapCache = new HashMap<String,String>();
 	private static final Logger logger = Logger.getLogger( MapClient.class.getName());
 	
