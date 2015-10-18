@@ -12,8 +12,6 @@ public class Map {
 	
 	public static int getTile( long x, long y) {
 		
-		// this generates a number between 0 and 32768
-		
 		long randomNumber = rand.nextLong( 10000);
 		
 		if ( isBetween( randomNumber, 	0		, 	500		)) return TILE_DESERT_GRASS;
