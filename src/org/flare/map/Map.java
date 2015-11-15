@@ -7,6 +7,7 @@ public class Map {
 	public static int TILE_DESERT_GRASS = 2; 
 	public static int TILE_DESERT_CAVE = 3; 
 	public static int TILE_DESERT_PLANT_WITH_BERRIES = 4; 
+	public static int TILE_DESERT_STONE = 5;
 	
 	private static MWCRandom rand = new MWCRandom( 31415926);
 	

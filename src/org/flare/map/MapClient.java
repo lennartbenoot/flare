@@ -19,6 +19,10 @@ public class MapClient {
 	
 	public static int getTile( long x, long y) {
 		
+		//mirror world :)
+		x = Math.abs( x);
+		y = Math.abs( y);
+		
 		// Identify mapblock and tile within mapblock 
 		long blockX = x / 100;
 		long blockY = y / 100;
@@ -39,7 +43,10 @@ public class MapClient {
 				return 0;
 			}
 		}
-		
+		if ( (xInBlock * 100 + yInBlock) < 0 ) {
+			System.out.println( xInBlock + ":" + yInBlock);
+			return Map.TILE_DESERT_STONE;
+		}
 		return mapBlock.charAt( (int) ( xInBlock * 100 + yInBlock)) - 14;
 	}
 	

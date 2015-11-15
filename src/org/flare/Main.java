@@ -5,10 +5,14 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import org.flare.creatures.Creature;
 import org.flare.creatures.Rat;
+import org.flare.map.Map;
 import org.flare.map.MapClient;
+import org.flare.map.Tiles;
+import org.flare.server.FlareServer;
 import org.flare.server.player.Challenge;
 import org.flare.server.player.Player;
 
@@ -31,40 +35,35 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class Main extends Application {
-	
+
 	public static String playerName;
 	public static String password;
 	public static String hostname;
-	
+
 	public static Socket connection;
-	
-	public static int MAX_X = 1024;
-	public static int MAX_Y = 768;
-	public static int TILE_SIZE = 16;
+
+	public static int MAX_X = 1920;
+	public static int MAX_Y = 1000;
+	public static int TILE_SIZE = 32;
 
 	public static int canvasX1 = 0;
 	public static int canvasY1 = 0;
 	public static int canvasX2;
 	public static int canvasY2;
-	
-    public static DataOutputStream outToServer;
-    public static BufferedReader inFromServer;
+
+	public static DataOutputStream outToServer;
+	public static BufferedReader inFromServer;
 
 	public static ArrayList<Creature> creatures = new ArrayList<Creature>();
-	public Image desert = new Image(
-			"https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/desert.fw.png");
-	public Image desertGrass = new Image(
-			"https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/desert-grass.fw.png");
-	public Image desertStone = new Image(
-			"https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/desert-stone.fw.png");
-	public Image creatureImage = new Image ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/creature.fw.png");
 
-	public static Player you = new Player();
-
+	public static Player player = new Player();
+	
+	private static final Logger logger = Logger.getLogger( Main.class.getName());
+	
 	@Override
 	public void start(Stage theStage) {
 		try {
-			
+
 			canvasX2 = (canvasX1 + (MAX_X / TILE_SIZE));
 			canvasY2 = (canvasY1 + (MAX_Y / TILE_SIZE));
 
@@ -84,22 +83,30 @@ public class Main extends Application {
 				@Override
 				public void handle(KeyEvent keyEvent) {
 					if (keyEvent.getCode() == KeyCode.UP) {
-						you.dy = 1;
+						player.dy = 0.1F;
+
+					}
+					if (keyEvent.getCode() == KeyCode.DOWN) {
+						player.dy = -0.1F;
+
+					}
+					if (keyEvent.getCode() == KeyCode.LEFT) {
+						player.dx = -0.1F;
+
+					}
+					if (keyEvent.getCode() == KeyCode.RIGHT) {
+						player.dx = 0.1F;
+
+					}
+					if (keyEvent.getCode() == KeyCode.F) {
+
+						logger.info( "Action on tile: " + player.x + ":" +  player.y +":"+ MapClient.getTile( (long) player.x, (long)player.y));
+						
+						if ( MapClient.getTile( (long) player.x, (long)player.y) == Map.TILE_DESERT_PLANT_WITH_BERRIES)
+							player.eat( 10);
 						
 					}
-					if (keyEvent.getCode() == KeyCode.DOWN){
-						you.dy = -1;
-						
-					}
-					if (keyEvent.getCode() == KeyCode.LEFT){
-						you.dx = -1;
-						
-					}
-					if (keyEvent.getCode() == KeyCode.RIGHT){
-						you.dx = 1;
-						
-					}
-					
+
 				}
 			});
 
@@ -107,71 +114,97 @@ public class Main extends Application {
 				@Override
 				public void handle(KeyEvent keyEvent) {
 					if (keyEvent.getCode() == KeyCode.UP)
-						you.dy = 0;
+						player.dy = 0;
 					if (keyEvent.getCode() == KeyCode.DOWN)
-						you.dy = 0;
+						player.dy = 0;
 					if (keyEvent.getCode() == KeyCode.LEFT)
-						you.dx = 0;
+						player.dx = 0;
 					if (keyEvent.getCode() == KeyCode.RIGHT)
-						you.dx = 0;
+						player.dx = 0;
 
 				}
 			});
 
-			KeyFrame animate = new KeyFrame(Duration.seconds( 0.05), new EventHandler<ActionEvent>() {
+			KeyFrame animate = new KeyFrame(Duration.seconds(0.05), new EventHandler<ActionEvent>() {
 
 				public void handle(ActionEvent event) {
 
 					gc.clearRect(0, 0, MAX_X, MAX_Y);
 
-					
-					//move the canvas
-					canvasX1 += you.dx;
-					canvasY1 += you.dy;
+					// move the canvas
+					canvasX1 = (int) ( player.getX() - (MAX_X / TILE_SIZE / 2) );
+					canvasY1 = (int) ( player.getY() - (MAX_Y / TILE_SIZE / 2) );
 					canvasX2 = (canvasX1 + (MAX_X / TILE_SIZE));
 					canvasY2 = (canvasY1 + (MAX_Y / TILE_SIZE));
-					
+
 					// draw background
 					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
 						for (int y = 0; y < MAX_Y / TILE_SIZE; y++) {
 
-							long tile = MapClient.getTile( canvasX1 + x, canvasY1 +y);
+							long tile = MapClient.getTile(canvasX1 + x, canvasY1 + y);
 							Image tileImage;
-							
 
-							if (tile == 9)
-								tileImage = desertStone;
-							else if ((tile > 90) && (tile < 100))
-								tileImage = desertGrass;
+							if (tile == Map.TILE_DESERT)
+								tileImage = Tiles.desert;
+							else if (tile == Map.TILE_DESERT_GRASS)
+								tileImage = Tiles.desertGrass;
+							else if (tile == Map.TILE_DESERT_CAVE)
+								tileImage = Tiles.desertCave;
+							else if (tile == Map.TILE_DESERT_PLANT_WITH_BERRIES)
+								tileImage = Tiles.desertPlantWithBerries;
+							else if (tile == Map.TILE_DESERT_STONE)
+								tileImage = Tiles.desertStone;
 							else
-								tileImage = desert;
-								
-							gc.drawImage( tileImage, x * TILE_SIZE, MAX_Y - (  y * TILE_SIZE));
+								tileImage = Tiles.desert;
+							
+							// 
+							float sdxf = (player.x % 1 ) * TILE_SIZE;
+							float sdyf = (player.y % 1 ) * TILE_SIZE;
+							int sdx = (int) (((long) sdxf) % TILE_SIZE);
+							int sdy = (int) (((long) sdyf) % TILE_SIZE);
+							gc.drawImage(tileImage, (TILE_SIZE - sdx)  + x * TILE_SIZE, sdy + MAX_Y - (y * TILE_SIZE));
+
+							if (tile == Map.TILE_DESERT_STONE)
+								gc.fillText(canvasX1 + x + ":" + canvasY1 + y, x * TILE_SIZE, MAX_Y - (y * TILE_SIZE));
 						}
-					
+
 					for (Creature c : creatures) {
 
 						c.move();
 
 						// calculate position
-						float posX = (c.x - canvasX1 )  * (float) TILE_SIZE;
-						float posY = MAX_Y - ( (c.y - canvasY1) * (float) TILE_SIZE);
+						float posX = (c.x - canvasX1) * (float) TILE_SIZE;
+						float posY = MAX_Y - ((c.y - canvasY1) * (float) TILE_SIZE);
 
-						
-						gc.drawImage( creatureImage, posX, posY);
+						gc.drawImage(Tiles.creatureImage, posX, posY);
 					}
-					
+
 					// debug info
-					gc.fillText("MAP: (" + canvasX1 + "," + canvasY1 + ")-(" + canvasX2 + "," + canvasY2  + ")", 10, 10);
-					gc.fillText("YOU: (" + you.x + "," + you.y + ")", 10, 20 );
-					
+					gc.fillText("MAP: (" + canvasX1 + "," + canvasY1 + ")-(" + canvasX2 + "," + canvasY2 + ")", 10, 10);
+					gc.fillText("YOU: (" + player.x + "," + player.y + ")", 10, 20);
+
 					// Dashboard
 					gc.setFill(Color.WHITE);
 					gc.fillRect(5, MAX_Y - 65, MAX_X - 10, 60);
 					gc.setFill(Color.RED);
-					gc.fillText("Your next challenge" , 7, MAX_Y - 52);
+					gc.fillText("Your next challenge", 7, MAX_Y - 52);
 					gc.setFill(Color.BLACK);
-					gc.fillText(Challenge.challenge[ 0], 7, MAX_Y - 32);
+					gc.fillText(Challenge.challenge[0], 7, MAX_Y - 32);
+
+					gc.fillText("Food", 800, MAX_Y - 52);
+					gc.setFill(Color.LIGHTGREY);
+					gc.fillRect(850, MAX_Y - 62, 100, 10);
+					gc.setFill(Color.LIGHTGREEN);
+					gc.fillRect(850, MAX_Y - 62, player.getFood(), 10);
+
+					
+					// Show rulers
+					gc.setFill(Color.BLACK);
+					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
+						gc.fillText(String.valueOf(canvasX1 + x), x * TILE_SIZE, MAX_Y);
+
+					for (int y = 0; y < MAX_Y / TILE_SIZE; y++)
+						gc.fillText(String.valueOf(canvasY1 + y), 0, MAX_Y - (y * TILE_SIZE));
 				}
 			});
 
@@ -185,37 +218,41 @@ public class Main extends Application {
 	}
 
 	public static void main(String[] args) {
-		
-		// Get command line parameters
-		hostname = args[ 0];
-		playerName = args[ 1];
-		password = args[ 2];
-		
 
-		//open connection to server
+		// Get command line parameters
+		hostname = args[0];
+		playerName = args[1];
+		password = args[2];
+
+		// open connection to server
 
 		try {
-		    connection = new Socket(hostname, 9999);
-		  
-		    outToServer = new DataOutputStream( connection.getOutputStream());
-		    inFromServer = new BufferedReader(new InputStreamReader( connection.getInputStream()));
-		    
-		    outToServer.writeBytes( "CMD_PLAYER:"+playerName+":"+password + '\n');
-		    inFromServer.readLine();
+			connection = new Socket(hostname, 9999);
 
-		}
-		catch (Exception e){
+			outToServer = new DataOutputStream(connection.getOutputStream());
+			inFromServer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+			outToServer.writeBytes("CMD_PLAYER:" + playerName + ":" + password + '\n');
+			String response = inFromServer.readLine();
+			
+			String[] parsedResponse = response.split( FlareServer.SEPAROTOR);
+			
+			player.setX( Float.parseFloat( parsedResponse[ 0]));
+			player.setY( Float.parseFloat( parsedResponse[ 1]));
+				
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		you.x = 32;
-		you.y = 24;
-		you.type = "you";
-		creatures.add(you);
+		canvasX1 = (int) ( player.getX() - (MAX_X / TILE_SIZE / 2) );
+		canvasY1 = (int) ( player.getY() - (MAX_Y / TILE_SIZE / 2) );
+		
+		player.type = "you";
+		creatures.add(player);
 
 		Creature c = new Creature();
-		c.x = 1;
-		c.y = 1;
+		c.x = 10;
+		c.y = 10;
 		c.type = "vann";
 		creatures.add(c);
 

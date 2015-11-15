@@ -1,7 +1,5 @@
 package org.flare.creatures;
 
-import javafx.scene.image.Image;
-
 public class Rat extends Creature {
 
 	public String image = new String ("https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/rat.fw.png");

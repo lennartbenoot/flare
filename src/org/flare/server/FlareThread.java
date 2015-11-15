@@ -15,8 +15,6 @@ public class FlareThread extends Thread {
 
 	private static final Logger logger = Logger.getLogger(FlareThread.class.getName());
 
-	private static String SEPAROTOR = ":";
-
 	private Socket connection;
 	private String playerName;
 	private boolean connected = true;
@@ -57,7 +55,7 @@ public class FlareThread extends Thread {
 	private String handleRequest(String request) {
 		String response = "OK\n";
 
-		String parsedRequest[] = request.split(SEPAROTOR);
+		String parsedRequest[] = request.split( FlareServer.SEPAROTOR);
 		String cmd = parsedRequest[0];
 
 		if (cmd.equals("CMD_PLAYER")) {
@@ -67,7 +65,7 @@ public class FlareThread extends Thread {
 			Player player = PlayerStore.getInstance().findPlayerByName(playerName);
 
 			// return location and challenge
-			response = player.getX() + ";" + player.getY() + ";" + player.getChallenge() + "\n";
+			response = player.getX() + FlareServer.SEPAROTOR + player.getY() + FlareServer.SEPAROTOR + player.getChallenge() + "\n";
 			logger.info("Response: " + response);
 		}
 

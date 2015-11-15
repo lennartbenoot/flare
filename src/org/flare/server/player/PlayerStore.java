@@ -15,8 +15,8 @@ public class PlayerStore {
 		if ( name.equals("Slaine")) {
 			
 			player = new Player();
-			player.x = 1000;
-			player.y = 1000;
+			player.x = 1000.5F;
+			player.y = 1000.5F;
 			player.setName( "Slaine");
 			player.setChallenge( 1);
 			

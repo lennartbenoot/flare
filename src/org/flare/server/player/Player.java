@@ -21,7 +21,13 @@ public class Player extends Creature{
 		
 		x= x + dx;
 		y= y + dy;	
+		
+		if (dx != 0) food = food - 0.1F;
+		if (dy != 0) food = food - 0.1F;
+		
+		if (food <=0 ) food= 0;
 	}
+	
 	
 	public String getImage() {
 		return image;	

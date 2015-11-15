@@ -15,8 +15,9 @@ public class Creature {
 	
 	public float x; 
 	public float y;
-	public int stamina;
-	public int strength;
+	public float stamina	= 100;
+	public float strength	= 100;
+	public float food	 	= 100;		// between 0 and 100
 	public float avgSpeed;  // average speed in meters per second x 10
 	
 	public String name;
@@ -24,14 +25,25 @@ public class Creature {
 	
 	private Random rand = new Random();
 	private int mem = rand.nextInt( 150);
-	public int dx = 0;
-	public int dy = 0;
+	public float dx = 0;
+	public float dy = 0;
 	
+
+	
+	public int getFood() {
+		return (int)food;
+	}
+	
+	public void eat( float amount) {
+		food += amount;
+		
+		if (food > 100) food = 100;
+	}
 
 	public void move() {
 		
-		x= x + zeroOneOrMinusOne();
-		y= y + zeroOneOrMinusOne();		
+		x= x + ( (float)zeroOneOrMinusOne() / 10);
+		y= y + ( (float)zeroOneOrMinusOne() / 10);		
 	}
 	
 	

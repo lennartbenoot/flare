@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class FlareServer {
+	
+	public static String SEPAROTOR = ":";
 
 	/**
 	 * Flare Server main program
