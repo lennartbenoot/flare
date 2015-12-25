@@ -138,6 +138,8 @@ public class Main extends Application {
 					canvasY2 = (canvasY1 + (MAX_Y / TILE_SIZE));
 
 					// draw background
+					int sdx=0;
+					int sdy=0;
 					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
 						for (int y = 0; y < MAX_Y / TILE_SIZE; y++) {
 
@@ -160,8 +162,8 @@ public class Main extends Application {
 							// 
 							float sdxf = (player.x % 1 ) * TILE_SIZE;
 							float sdyf = (player.y % 1 ) * TILE_SIZE;
-							int sdx = (int) (((long) sdxf) % TILE_SIZE);
-							int sdy = (int) (((long) sdyf) % TILE_SIZE);
+							sdx = (int) (((long) sdxf) % TILE_SIZE);
+							sdy = (int) (((long) sdyf) % TILE_SIZE);
 							gc.drawImage(tileImage, (TILE_SIZE - sdx)  + x * TILE_SIZE, sdy + MAX_Y - (y * TILE_SIZE));
 
 							if (tile == Map.TILE_DESERT_STONE)
@@ -173,8 +175,8 @@ public class Main extends Application {
 						c.move();
 
 						// calculate position
-						float posX = (c.x - canvasX1) * (float) TILE_SIZE;
-						float posY = MAX_Y - ((c.y - canvasY1) * (float) TILE_SIZE);
+						float posX = (c.x - canvasX1) * (float) TILE_SIZE + (TILE_SIZE - sdx);
+						float posY = MAX_Y - ((c.y - canvasY1) * (float) TILE_SIZE) + sdy ;
 
 						gc.drawImage(Tiles.creatureImage, posX, posY);
 					}
@@ -199,12 +201,12 @@ public class Main extends Application {
 
 					
 					// Show rulers
-					gc.setFill(Color.BLACK);
-					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
-						gc.fillText(String.valueOf(canvasX1 + x), x * TILE_SIZE, MAX_Y);
-
-					for (int y = 0; y < MAX_Y / TILE_SIZE; y++)
-						gc.fillText(String.valueOf(canvasY1 + y), 0, MAX_Y - (y * TILE_SIZE));
+//					gc.setFill(Color.BLACK);
+//					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
+//						gc.fillText(String.valueOf(canvasX1 + x), x * TILE_SIZE, MAX_Y);
+//
+//					for (int y = 0; y < MAX_Y / TILE_SIZE; y++)
+//						gc.fillText(String.valueOf(canvasY1 + y), 0, MAX_Y - (y * TILE_SIZE));
 				}
 			});
 
