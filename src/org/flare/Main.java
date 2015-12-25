@@ -200,7 +200,7 @@ public class Main extends Application {
 					gc.fillRect(850, MAX_Y - 62, player.getFood(), 10);
 
 					
-					// Show rulers
+					// Show rulers (todo move this code)
 //					gc.setFill(Color.BLACK);
 //					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
 //						gc.fillText(String.valueOf(canvasX1 + x), x * TILE_SIZE, MAX_Y);
