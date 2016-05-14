@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+import org.flare.creatures.Creature;
 import org.flare.map.Map;
 import org.flare.server.player.Player;
 import org.flare.server.player.PlayerStore;
@@ -17,6 +18,7 @@ public class FlareThread extends Thread {
 
 	private Socket connection;
 	private String playerName;
+	private Player player;
 	private boolean connected = true;
 
 	/**
@@ -58,17 +60,27 @@ public class FlareThread extends Thread {
 		String parsedRequest[] = request.split( FlareServer.SEPAROTOR);
 		String cmd = parsedRequest[0];
 
-		if (cmd.equals("CMD_PLAYER")) {
+		if (cmd.equals( FlareProtocol.CMD_PLAYER)) {
 			playerName = parsedRequest[1];
 			logger.info("New player connected: " + playerName);
 
-			Player player = PlayerStore.getInstance().findPlayerByName(playerName);
+			player = PlayerStore.getInstance().findPlayerByName(playerName);
 
 			// return location and challenge
 			response = player.getX() + FlareServer.SEPAROTOR + player.getY() + FlareServer.SEPAROTOR + player.getChallenge() + "\n";
 			logger.info("Response: " + response);
 		}
+		
+		if (cmd.equals( FlareProtocol.CMD_GET_CREATURES)) {
+			logger.info("Getting creatures for player: " + playerName);
 
+			Creature c =World.getInstance().creatures.get( 0);
+			Creature c2 =World.getInstance().creatures.get( 1);
+			response = ( c.getX() + FlareServer.SEPAROTOR + c.getY() + FlareServer.SEPAROTOR + c2.getX() + FlareServer.SEPAROTOR + c2.getY()) + "\n";
+			logger.info("Response: " + response);
+		}
+
+		// Get tiles
 		if (cmd.equals("CMD_GETTILE")) {
 			String xs = parsedRequest[1];
 			String ys = parsedRequest[2];
@@ -92,7 +104,15 @@ public class FlareThread extends Thread {
 
 			response = mapBlock + "\n";
 		}
-
+		
+		// Get tiles
+		if (cmd.equals( FlareProtocol.CMD_PLAYER_LOCATION)) {
+			logger.info("Player reports location: " + request);
+			
+			player.setX( Float.parseFloat( parsedRequest[1]));
+			player.setY( Float.parseFloat( parsedRequest[2]));
+		}
+		
 		return response;
 	}
 

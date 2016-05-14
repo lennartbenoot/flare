@@ -17,6 +17,13 @@ public class FlareServer {
 
 		ServerSocket serverSocket;
 		Socket socket = null;
+		
+		// create the world & run thread
+		World world = World.getInstance();
+		world.genesis();
+		world.start();
+		
+		// start server socket to accept client connections
 		try {
 			serverSocket = new ServerSocket(9999);
 

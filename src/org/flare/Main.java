@@ -12,6 +12,7 @@ import org.flare.creatures.Rat;
 import org.flare.map.Map;
 import org.flare.map.MapClient;
 import org.flare.map.Tiles;
+import org.flare.server.FlareProtocol;
 import org.flare.server.FlareServer;
 import org.flare.server.player.Challenge;
 import org.flare.server.player.Player;
@@ -29,6 +30,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -59,6 +62,8 @@ public class Main extends Application {
 	public static Player player = new Player();
 	
 	private static final Logger logger = Logger.getLogger( Main.class.getName());
+	//public static String hostName = "http://localhost:8888/";
+	public static String hostName = "https://562f98a3b8ddd7d99496959da12de0226dbca265-www.googledrive.com/host/0B7gYPVDBv3F1TmNPWFl4aUFwQms/";
 	
 	@Override
 	public void start(Stage theStage) {
@@ -127,7 +132,15 @@ public class Main extends Application {
 
 			KeyFrame animate = new KeyFrame(Duration.seconds(0.05), new EventHandler<ActionEvent>() {
 
+				// Keyframe loop
 				public void handle(ActionEvent event) {
+					
+					try {
+					
+					//report player location to server
+					outToServer.writeBytes( FlareProtocol.CMD_PLAYER_LOCATION + ":" + player.x + ":" + player.y +'\n');
+					String response = inFromServer.readLine();
+					
 
 					gc.clearRect(0, 0, MAX_X, MAX_Y);
 
@@ -140,8 +153,8 @@ public class Main extends Application {
 					// draw background
 					int sdx=0;
 					int sdy=0;
-					for (int x = 0; x < MAX_X / TILE_SIZE; x++)
-						for (int y = 0; y < MAX_Y / TILE_SIZE; y++) {
+					for (int x = -1; x < MAX_X / TILE_SIZE; x++)
+						for (int y = 0; y < MAX_Y / TILE_SIZE + 3; y++) {
 
 							long tile = MapClient.getTile(canvasX1 + x, canvasY1 + y);
 							Image tileImage;
@@ -169,14 +182,38 @@ public class Main extends Application {
 							if (tile == Map.TILE_DESERT_STONE)
 								gc.fillText(canvasX1 + x + ":" + canvasY1 + y, x * TILE_SIZE, MAX_Y - (y * TILE_SIZE));
 						}
+					
+					// get creatures
+					outToServer.writeBytes( FlareProtocol.CMD_GET_CREATURES +'\n');
+					response = inFromServer.readLine();
+					String parsedResponse[] = response.split( FlareServer.SEPAROTOR);
+					Creature c1 = new Creature();
+					Creature c2 = new Creature();
+					c1.setX( Float.parseFloat( parsedResponse[0]));
+					c1.setY( Float.parseFloat( parsedResponse[1]));
+					c2.setX( Float.parseFloat( parsedResponse[2]));
+					c2.setY( Float.parseFloat( parsedResponse[3]));
+					// calculate position
+					float posX = (c1.x - canvasX1) * (float) TILE_SIZE + (TILE_SIZE - sdx);
+					float posY = MAX_Y - ((c1.y - canvasY1) * (float) TILE_SIZE) + sdy ;
 
+					
+					gc.drawImage(Tiles.hollow, posX, posY);
+					
+					//
+					posX = (c2.x - canvasX1) * (float) TILE_SIZE + (TILE_SIZE - sdx);
+					posY = MAX_Y - ((c2.y - canvasY1) * (float) TILE_SIZE) + sdy ;
+
+					gc.drawImage(Tiles.hollow, posX, posY);
+						
+					// draw creatures
 					for (Creature c : creatures) {
 
 						c.move();
 
 						// calculate position
-						float posX = (c.x - canvasX1) * (float) TILE_SIZE + (TILE_SIZE - sdx);
-						float posY = MAX_Y - ((c.y - canvasY1) * (float) TILE_SIZE) + sdy ;
+						posX = (c.x - canvasX1) * (float) TILE_SIZE + (TILE_SIZE - sdx);
+						posY = MAX_Y - ((c.y - canvasY1) * (float) TILE_SIZE) + sdy ;
 
 						gc.drawImage(Tiles.creatureImage, posX, posY);
 					}
@@ -207,6 +244,12 @@ public class Main extends Application {
 //
 //					for (int y = 0; y < MAX_Y / TILE_SIZE; y++)
 //						gc.fillText(String.valueOf(canvasY1 + y), 0, MAX_Y - (y * TILE_SIZE));
+					
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+					
 				}
 			});
 
@@ -225,6 +268,12 @@ public class Main extends Application {
 		hostname = args[0];
 		playerName = args[1];
 		password = args[2];
+		
+		// play Flare song
+		Media media = new Media( "file:///d:/eclipseflare/workspace/Flare.mp3");
+		MediaPlayer mediaPlayer = new MediaPlayer( media);
+		mediaPlayer.setCycleCount( MediaPlayer.INDEFINITE);
+		mediaPlayer.play();
 
 		// open connection to server
 
@@ -234,7 +283,7 @@ public class Main extends Application {
 			outToServer = new DataOutputStream(connection.getOutputStream());
 			inFromServer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-			outToServer.writeBytes("CMD_PLAYER:" + playerName + ":" + password + '\n');
+			outToServer.writeBytes( FlareProtocol.CMD_PLAYER + ":" + playerName + ":" + password + '\n');
 			String response = inFromServer.readLine();
 			
 			String[] parsedResponse = response.split( FlareServer.SEPAROTOR);
@@ -251,18 +300,6 @@ public class Main extends Application {
 		
 		player.type = "you";
 		creatures.add(player);
-
-		Creature c = new Creature();
-		c.x = 10;
-		c.y = 10;
-		c.type = "vann";
-		creatures.add(c);
-
-		c = new Rat();
-		c.x = 1;
-		c.y = 1;
-		c.type = "rat";
-		creatures.add(c);
 
 		launch(args);
 	}
