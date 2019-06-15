@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Test comment 2
+ * 
+ * @author lennartb
+ *
+ */
 public class FlareServer {
 	
 	public static String SEPAROTOR = ":";
@@ -17,13 +23,6 @@ public class FlareServer {
 
 		ServerSocket serverSocket;
 		Socket socket = null;
-		
-		// create the world & run thread
-		World world = World.getInstance();
-		world.genesis();
-		world.start();
-		
-		// start server socket to accept client connections
 		try {
 			serverSocket = new ServerSocket(9999);
 
